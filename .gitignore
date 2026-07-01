@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+fix*.cjs
+token.tmp
+node_modules/
