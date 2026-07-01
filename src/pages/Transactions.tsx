@@ -59,9 +59,9 @@ export default function Transactions() {
 
   const filtered = filter === 'all' ? transactions : transactions.filter(t => t.type === filter)
 
-  const typeIcon = (t) => t.type === 'income' ? '📈' : '📉'
-  const typeColor = (t) => t.type === 'income' ? '#2ECC71' : '#e74c3c'
-  const typeSign = (t) => t.type === 'income' ? '+' : '-'
+  const typeIcon = (t: any) => t.type === 'income' ? '📈' : '📉'
+  const typeColor = (t: any) => t.type === 'income' ? '#2ECC71' : '#e74c3c'
+  const typeSign = (t: any) => t.type === 'income' ? '+' : '-'
 
   return (
     <div style={{padding:'28px 24px',maxWidth:900,margin:'0 auto'}}>
