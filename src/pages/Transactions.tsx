@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
-import type { Transaction } from '../types'
+
 
 const emptyForm = { title: '', amount: '', date: '', category: '', type: 'expense' }
 const categories = ['Alimentation', 'Transport', 'Logement', 'Sante', 'Loisirs', 'Education', 'Autre']
 
 export default function Transactions() {
-  const [transactions, setTransactions] = useState([])
+  const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(emptyForm)
-  const [editId, setEditId] = useState(null)
+  const [editId, setEditId] = useState<number|null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [filter, setFilter] = useState('all')
 
@@ -45,13 +45,13 @@ export default function Transactions() {
     finally { setSubmitting(false) }
   }
 
-  const handleEdit = (t) => {
+  const handleEdit = (t: any) => {
     setForm({ title: t.title, amount: String(t.amount), date: t.date.slice(0,10), category: t.category || '', type: t.type || 'expense' })
     setEditId(t.id)
     setShowForm(true)
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     if (!confirm('Supprimer cette depense ?')) return
     await api.delete('/expenses/' + id)
     fetchTransactions()

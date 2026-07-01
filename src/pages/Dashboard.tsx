@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import api from '../api/axios'
 
 export default function Dashboard() {
-  const [transactions, setTransactions] = useState([])
+  const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function Dashboard() {
   }, {})
 
   const colors = ['#2ECC71','#3498db','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22']
-  const cats = Object.entries(byCategory).sort((a,b) => b[1]-a[1])
+  const cats = Object.entries(byCategory) as [string, number][].sort((a,b) => b[1]-a[1])
   const maxVal = cats.length > 0 ? cats[0][1] : 1
 
   if (loading) return <div style={{padding:40,textAlign:'center',color:'#888'}}>Chargement...</div>
