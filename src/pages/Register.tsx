@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import api from '../api/axios'
 
-export default function Register({ onSwitch }) {
+export default function Register({ onSwitch }: { onSwitch: (page: string, msg?: string) => void }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
