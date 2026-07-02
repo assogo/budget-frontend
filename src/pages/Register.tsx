@@ -16,44 +16,50 @@ export default function Register({ onSwitch }: { onSwitch: (page: string, msg?: 
     try {
       await api.post('/register', { email, password })
       onSwitch('login', 'Compte créé ! Connectez-vous.')
-    } catch(e) {
-      setError("Cet email est déjà utilisé ou invalide.")
-    } finally { setLoading(false) }
+    } catch { setError('Cet email est déjà utilisé.') }
+    finally { setLoading(false) }
+  }
+
+  const inp = {
+    width: '100%', padding: '11px 14px',
+    background: 'var(--bg3)', border: '1px solid var(--border)',
+    borderRadius: 10, fontSize: 14, color: 'var(--text)',
+    outline: 'none', boxSizing: 'border-box' as const,
   }
 
   return (
-    <div style={{minHeight:'100vh',background:'#f0fdf4',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{background:'#fff',borderRadius:16,padding:'40px 36px',width:'100%',maxWidth:400,boxShadow:'0 4px 24px rgba(46,204,113,0.10)',border:'1px solid #d4f5e0'}}>
-        <div style={{fontSize:24,fontWeight:700,color:'#2ECC71',marginBottom:16}}>💰 BudgetApp</div>
-        <h1 style={{fontSize:22,fontWeight:600,color:'#1a7a45',margin:'0 0 4px'}}>Créer un compte</h1>
-        <p style={{fontSize:13,color:'#888',margin:'0 0 24px'}}>Commencez à gérer votre budget gratuitement</p>
-        {error && <div style={{background:'#fff0f0',border:'1px solid #fca5a5',color:'#dc2626',borderRadius:8,padding:'10px 14px',fontSize:13,marginBottom:16}}>{error}</div>}
-        <div style={{marginBottom:16}}>
-          <label style={{display:'block',fontSize:13,fontWeight:500,color:'#444',marginBottom:6}}>Email</label>
-          <input style={{width:'100%',padding:'10px 14px',border:'1.5px solid #e0e0e0',borderRadius:8,fontSize:14,boxSizing:'border-box'}}
-            type="email" placeholder="vous@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ width: '100%', maxWidth: 400 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontSize: 36, marginBottom: 8 }}>💼</div>
+          <h1 style={{ fontFamily: 'var(--font-title)', fontSize: 26, fontWeight: 700, color: 'var(--white)', marginBottom: 6 }}>FinanceApp</h1>
+          <p style={{ color: 'var(--muted)', fontSize: 14 }}>Commencez à gérer votre budget</p>
         </div>
-        <div style={{marginBottom:16}}>
-          <label style={{display:'block',fontSize:13,fontWeight:500,color:'#444',marginBottom:6}}>Mot de passe</label>
-          <input style={{width:'100%',padding:'10px 14px',border:'1.5px solid #e0e0e0',borderRadius:8,fontSize:14,boxSizing:'border-box'}}
-            type="password" placeholder="6 caractères minimum" value={password} onChange={e => setPassword(e.target.value)} />
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 16, padding: '28px 24px' }}>
+          <h2 style={{ fontSize: 17, fontWeight: 600, color: 'var(--white)', marginBottom: 20 }}>Créer un compte</h2>
+          {error && <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: 8, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>{error}</div>}
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Email</label>
+            <input style={inp} type="email" placeholder="vous@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mot de passe</label>
+            <input style={inp} type="password" placeholder="6 caractères minimum" value={password} onChange={e => setPassword(e.target.value)} />
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Confirmer</label>
+            <input style={inp} type="password" placeholder="••••••••" value={confirm} onChange={e => setConfirm(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
+          </div>
+          <button onClick={handleSubmit} disabled={loading} style={{
+            width: '100%', background: 'var(--blue)', color: '#fff',
+            border: 'none', borderRadius: 10, padding: '12px',
+            fontSize: 14, fontWeight: 600, opacity: loading ? 0.7 : 1,
+          }}>{loading ? 'Création...' : 'Créer mon compte'}</button>
+          <p style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: 'var(--muted)' }}>
+            Déjà un compte ?{' '}
+            <button onClick={() => onSwitch('login')} style={{ background: 'none', border: 'none', color: 'var(--blue)', fontWeight: 600, fontSize: 13 }}>Se connecter</button>
+          </p>
         </div>
-        <div style={{marginBottom:20}}>
-          <label style={{display:'block',fontSize:13,fontWeight:500,color:'#444',marginBottom:6}}>Confirmer le mot de passe</label>
-          <input style={{width:'100%',padding:'10px 14px',border:'1.5px solid #e0e0e0',borderRadius:8,fontSize:14,boxSizing:'border-box'}}
-            type="password" placeholder="••••••••" value={confirm} onChange={e => setConfirm(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
-        </div>
-        <button style={{width:'100%',background:'#2ECC71',color:'#fff',border:'none',borderRadius:8,padding:'12px',fontSize:15,fontWeight:600,cursor:'pointer',opacity:loading?0.7:1}}
-          onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Création...' : 'Créer mon compte'}
-        </button>
-        <p style={{textAlign:'center',marginTop:16,fontSize:13,color:'#888'}}>
-          Déjà un compte ?{' '}
-          <button onClick={() => onSwitch('login')} style={{background:'none',border:'none',color:'#2ECC71',cursor:'pointer',fontWeight:600,fontSize:13}}>
-            Se connecter
-          </button>
-        </p>
       </div>
     </div>
   )

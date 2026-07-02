@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 
+const fmt = (n: number) => n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
 export default function Dashboard() {
   const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -15,81 +17,89 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  const income = transactions.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0)
-  const expense = transactions.filter(t => t.type !== 'income').reduce((s,t) => s + t.amount, 0)
+  const income = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+  const expense = transactions.filter(t => t.type !== 'income').reduce((s, t) => s + t.amount, 0)
   const balance = income - expense
 
-  const byCategory = transactions.reduce((acc, t) => {
+  const byCategory = transactions.reduce((acc: any, t) => {
     const cat = t.category || 'Autre'
     acc[cat] = (acc[cat] || 0) + t.amount
     return acc
   }, {})
-
-  const colors = ['#2ECC71','#3498db','#e74c3c','#f39c12','#9b59b6','#1abc9c','#e67e22']
-  const cats = (Object.entries(byCategory) as [string, number][]).sort((a,b) => b[1]-a[1])
+  const cats = (Object.entries(byCategory) as [string, number][]).sort((a, b) => b[1] - a[1])
   const maxVal = cats.length > 0 ? cats[0][1] : 1
+  const colors = ['#4A90D9','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#ec4899']
 
-  if (loading) return <div style={{padding:40,textAlign:'center',color:'#888'}}>Chargement...</div>
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: 'var(--muted)', fontSize: 14 }}>
+      Chargement...
+    </div>
+  )
 
   return (
-    <div style={{padding:'28px 24px',maxWidth:900,margin:'0 auto'}}>
-      <h1 style={{fontSize:24,fontWeight:600,color:'#1a7a45',margin:'0 0 24px'}}>Dashboard</h1>
+    <div style={{ padding: '24px 20px', maxWidth: 960, margin: '0 auto' }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontFamily: 'var(--font-title)', fontSize: 22, fontWeight: 700, color: 'var(--white)', marginBottom: 4 }}>Vue d'ensemble</h1>
+        <p style={{ color: 'var(--muted)', fontSize: 13 }}>{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+      </div>
 
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:24}}>
-        <div style={{background:'#fff',borderRadius:12,padding:20,border:'1px solid #e8e8e8',borderTop:'4px solid #2ECC71'}}>
-          <span style={{display:'block',fontSize:12,color:'#888',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.5px'}}>Solde</span>
-          <span style={{fontSize:26,fontWeight:700,color:balance>=0?'#2ECC71':'#e74c3c'}}>{balance>=0?'+':''}{balance.toFixed(2)} euro</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14, marginBottom: 24 }}>
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 20px 16px', borderTop: '3px solid var(--blue)' }}>
+          <p style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>Solde net</p>
+          <p style={{ fontFamily: 'var(--font-title)', fontSize: 28, fontWeight: 700, color: balance >= 0 ? 'var(--green)' : 'var(--red)', lineHeight: 1 }}>{balance >= 0 ? '+' : ''}{fmt(balance)} €</p>
+          <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{transactions.length} transaction{transactions.length > 1 ? 's' : ''}</p>
         </div>
-        <div style={{background:'#fff',borderRadius:12,padding:20,border:'1px solid #e8e8e8',borderTop:'4px solid #3498db'}}>
-          <span style={{display:'block',fontSize:12,color:'#888',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.5px'}}>Revenus</span>
-          <span style={{fontSize:26,fontWeight:700,color:'#3498db'}}>+{income.toFixed(2)} euro</span>
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 20px 16px', borderTop: '3px solid var(--green)' }}>
+          <p style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>Revenus</p>
+          <p style={{ fontFamily: 'var(--font-title)', fontSize: 28, fontWeight: 700, color: 'var(--green)', lineHeight: 1 }}>+{fmt(income)} €</p>
+          <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{transactions.filter(t => t.type === 'income').length} entrée{transactions.filter(t => t.type === 'income').length > 1 ? 's' : ''}</p>
         </div>
-        <div style={{background:'#fff',borderRadius:12,padding:20,border:'1px solid #e8e8e8',borderTop:'4px solid #e74c3c'}}>
-          <span style={{display:'block',fontSize:12,color:'#888',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.5px'}}>Depenses</span>
-          <span style={{fontSize:26,fontWeight:700,color:'#e74c3c'}}>-{expense.toFixed(2)} euro</span>
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 20px 16px', borderTop: '3px solid var(--red)' }}>
+          <p style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>Dépenses</p>
+          <p style={{ fontFamily: 'var(--font-title)', fontSize: 28, fontWeight: 700, color: 'var(--red)', lineHeight: 1 }}>-{fmt(expense)} €</p>
+          <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>{transactions.filter(t => t.type !== 'income').length} sortie{transactions.filter(t => t.type !== 'income').length > 1 ? 's' : ''}</p>
         </div>
       </div>
 
-      {cats.length > 0 && (
-        <div style={{background:'#fff',borderRadius:12,padding:24,border:'1px solid #e8e8e8',marginBottom:24}}>
-          <h2 style={{fontSize:16,fontWeight:600,color:'#222',margin:'0 0 20px'}}>Repartition par categorie</h2>
-          {cats.map(([cat, val], i) => (
-            <div key={cat} style={{marginBottom:14}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-                <span style={{fontSize:13,fontWeight:500,color:'#444'}}>{cat}</span>
-                <span style={{fontSize:13,fontWeight:600,color:colors[i%colors.length]}}>{val.toFixed(2)} euro</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--white)', marginBottom: 16 }}>Répartition par catégorie</h2>
+          {cats.length === 0 ? (
+            <p style={{ color: 'var(--muted)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Aucune donnée</p>
+          ) : cats.map(([cat, val], i) => (
+            <div key={cat} style={{ marginBottom: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                <span style={{ fontSize: 13, color: 'var(--text)' }}>{cat}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: colors[i % colors.length] }}>{fmt(val)} €</span>
               </div>
-              <div style={{background:'#f0f0f0',borderRadius:99,height:8,overflow:'hidden'}}>
-                <div style={{width:(val/maxVal*100)+'%',height:'100%',background:colors[i%colors.length],borderRadius:99,transition:'width 0.5s'}} />
+              <div style={{ background: 'var(--bg3)', borderRadius: 99, height: 6 }}>
+                <div style={{ width: (val / maxVal * 100) + '%', height: '100%', background: colors[i % colors.length], borderRadius: 99, transition: 'width 0.6s ease' }} />
               </div>
             </div>
           ))}
         </div>
-      )}
 
-      <div style={{background:'#fff',borderRadius:12,padding:20,border:'1px solid #e8e8e8'}}>
-        <h2 style={{fontSize:16,fontWeight:600,color:'#222',margin:'0 0 16px'}}>Transactions recentes</h2>
-        {transactions.length===0 ? (
-          <div style={{textAlign:'center',color:'#bbb',fontSize:14,padding:'20px 0'}}>Aucune transaction. Ajoutez-en une !</div>
-        ) : (
-          transactions.slice(0,5).map(t => (
-            <div key={t.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:'1px solid #f5f5f5'}}>
-              <div style={{display:'flex',alignItems:'center',gap:12}}>
-                <span style={{fontSize:22}}>{t.type==='income'?'📈':'📉'}</span>
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--white)', marginBottom: 16 }}>Dernières transactions</h2>
+          {transactions.length === 0 ? (
+            <p style={{ color: 'var(--muted)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Aucune transaction</p>
+          ) : transactions.slice(0, 6).map(t => (
+            <div key={t.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: t.type === 'income' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+                  {t.type === 'income' ? '↑' : '↓'}
+                </div>
                 <div>
-                  <div style={{fontSize:14,fontWeight:500}}>{t.title}</div>
-                  <div style={{display:'flex',gap:6,marginTop:2}}>
-                    {t.category && <span style={{background:'#f0fdf4',color:'#1a7a45',fontSize:11,padding:'1px 6px',borderRadius:8}}>{t.category}</span>}
-                    <span style={{fontSize:12,color:'#aaa'}}>{new Date(t.date).toLocaleDateString('fr-FR')}</span>
-                  </div>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 1 }}>{t.title}</p>
+                  <p style={{ fontSize: 11, color: 'var(--muted)' }}>{t.category || 'Sans catégorie'} · {new Date(t.date).toLocaleDateString('fr-FR')}</p>
                 </div>
               </div>
-              <span style={{fontSize:15,fontWeight:600,color:t.type==='income'?'#2ECC71':'#e74c3c'}}>
-                {t.type==='income'?'+':'-'}{t.amount.toFixed(2)} euro
+              <span style={{ fontSize: 14, fontWeight: 600, color: t.type === 'income' ? 'var(--green)' : 'var(--red)' }}>
+                {t.type === 'income' ? '+' : '-'}{fmt(t.amount)} €
               </span>
             </div>
-          ))
-        )}
+          ))}
+        </div>
       </div>
     </div>
   )
